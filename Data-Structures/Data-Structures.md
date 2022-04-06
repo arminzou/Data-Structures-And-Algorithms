@@ -1,0 +1,68 @@
+# Data Structures
+
+Data structures has their own trade-offs at **Operations**:
+
+- Insertion
+- Deletion
+- Traversal
+- Searching
+- Sorting
+- Access
+
+## List of Data Structures
+
+- [Array](#array)
+-
+
+## Array
+
+---
+
+### There are two types of **arrays**:
+- Array (Static)
+- Dynamic Array
+
+Difference between the two?
+
+- Static Array is fix in size
+
+### Implementing An Array
+```
+class MyArray {
+    constructor() {
+        this.length = 0;
+        this.data = {};
+    }
+
+    get(index) {
+        return this.data[index]
+    }
+
+    push(item) {
+        this.data[this.length] = item;
+        this.length++;
+        return this.length;
+    }
+
+    pop() {
+        const lastItem = this.data[this.length-1];
+        delete this.data[this.length-1];
+        this.length--;
+        return lastItem;
+    }
+
+    delete(index) {
+        const item = this.data[index];
+        this.shiftItems(index);
+        return item;
+    }
+
+    shiftItems(index) {
+        for (let i = index; i < this.length - 1; i++) {
+            this.data[i] = this.data[i+1];
+        }
+        delete this.data[this.length-1];
+        this.length--;
+    }
+}
+```
