@@ -15,7 +15,10 @@ Data structures has their own trade-offs at **Operations**:
 -   [Hash Table](#hash-table)
 -   [Linked List](#linked-list)
 -   [Stack And Queue](#stack-and-queue)
-
+-   [Tree](#tree)
+    -   [Binary Tree](#binary-tree)
+    -   [Trie](#trie)
+-   [Graph](#graph)
 ## Array
 
 ---
@@ -344,6 +347,7 @@ class DoublyLinkedList {
 -   More Memory
 
 ## Stack and Queue
+---
 
 **Stack**: A linear data structure that follows the principle of Last In First Out (LIFO). This means the last element inserted inside the stack is removed first.
 
@@ -354,7 +358,7 @@ Time complexity of Stack
 -   push O(1)
 -   peek O(1)
 
-Stack Implementation:
+Stack Implementation with linked list:
 
 ```
 class Node {
@@ -401,6 +405,30 @@ class Stack {
 }
 ```
 
+Stack Implementation with array:
+
+```
+class Stack {
+    constructor() {
+        this.data = [];
+    }
+    peek() {
+        return this.array[this.array.length - 1];
+    }
+    push(value) {
+        this.data.push(value);
+    }
+    pop() {
+        this.data.pop();
+    }
+}
+
+var myStack = new Stack();
+myStack.push("Google");
+myStack.peek();
+
+```
+
 **Queue**: A collection of items in which only the earliest added item may be accessed. First In First Out (FIFO)
 
 Time complexity of Queue
@@ -409,4 +437,379 @@ Time complexity of Queue
 -   enqueue O(1)
 -   dequeue O(1)
 -   peek O(1)
+
+Queue Implementation
+
+```
+class Node {
+    constructor(value) {
+        this.value = value;
+        this.next = null;
+    }
+}
+class Queue {
+    constructor() {
+        this.first = null;
+        this.last = null;
+        this.length = 0;
+    }
+    peek() {
+        return this.first;
+    }
+
+    enqueue(value) {
+        const newNode = new Node(value);
+        // element exist
+        if (this.length > 0) {
+            this.last.next = newNode;
+        }
+        // empty queue
+        else {
+            this.first = newNode;
+        }
+        this.last = newNode;
+        this.length++;
+        return this;
+    }
+    dequeue() {
+        if (!this.first) {
+            return null;
+        }
+        if (this.length == 1) {
+            this.last = null;
+        }
+        this.first = this.first.next;
+        this.length--;
+        return this;
+    }
+}
+
+var myQueue = new Queue();
+myQueue.enqueue("Joy");
+myQueue.enqueue("Matt");
+myQueue.enqueue("Pavel");
+myQueue.enqueue("Samir");
+myQueue.dequeue();
+myQueue.dequeue();
+myQueue.dequeue();
+myQueue.dequeue();
+
+```
+
+Why you don't want to build queue with array?
+
+-   Arrays have indexes associated with them, and a queue operates a first in, first out (FIFO) priciple, it will require to shift the indexes if we delete the first element from the array, that is linear time O(n) operation, which is slow.
+--- 
+
+## Tree
+Tree: A data structure that have hierarchical structure
+
+## Binary-tree
+---
+
+**Binary Search Tree**: A sorted binary tree data structure that has following properties:
+- Each node can have up to two child nodes
+- Only nodes with smaller values in its left sub tree
+- Only nodes with larger values in its right sun tree
+
+Number of node of perfect binary treee = 2^h - 1 
+log nodes = height
+
+log 100 = 2 => 10^2 = 100
+
+Time complexity of **Binary Search Tree**
+-   lookup O(log N)
+-   insert O(log N)
+-   delete O(log N)
+
+Image a situation where we have really unbalanced binary search tree where all the node just keep getting added to the right, sorted of turns into a long linked list.
+
+**Unbalanced Binary Tree**
+-   lookup O(n)
+-   insert O(n)
+-   delete O(n)
+
+**Binary Search Tree Implementation**
+```
+class Node {
+  constructor(value){
+    this.left = null;
+    this.right = null;
+    this.value = value;
+  }
+}
+
+class BinarySearchTree {
+  constructor(){
+    this.root = null;
+  }
+  insert(value){
+    const newNode = new Node(value);
+    if (this.root === null) {
+      this.root = newNode;
+    } else {
+      let currentNode = this.root;
+      while(true){
+        if(value < currentNode.value){
+          //Left
+          if(!currentNode.left){
+            currentNode.left = newNode;
+            return this;
+          }
+          currentNode = currentNode.left;
+        } else {
+          //Right
+          if(!currentNode.right){
+            currentNode.right = newNode;
+            return this;
+          } 
+          currentNode = currentNode.right;
+        }
+      }
+    }
+  }
+  lookup(value){
+    if (!this.root) {
+      return false;
+    }
+    let currentNode = this.root;
+    while(currentNode){
+      if(value < currentNode.value){
+        currentNode = currentNode.left;
+      } else if(value > currentNode.value){
+        currentNode = currentNode.right;
+      } else if (currentNode.value === value) {
+        return currentNode;
+      }
+    }
+    return null
+  }
+  remove(value) {
+    if (!this.root) {
+      return false;
+    }
+    let currentNode = this.root;
+    let parentNode = null;
+    while(currentNode){
+      if(value < currentNode.value){
+        parentNode = currentNode;
+        currentNode = currentNode.left;
+      } else if(value > currentNode.value){
+        parentNode = currentNode;
+        currentNode = currentNode.right;
+      } else if (currentNode.value === value) {
+        //We have a match, get to work!
+        
+        //Option 1: No right child: 
+        if (currentNode.right === null) {
+          if (parentNode === null) {
+            this.root = currentNode.left;
+          } else {
+            
+            //if parent > current value, make current left child a child of parent
+            if(currentNode.value < parentNode.value) {
+              parentNode.left = currentNode.left;
+            
+            //if parent < current value, make left child a right child of parent
+            } else if(currentNode.value > parentNode.value) {
+              parentNode.right = currentNode.left;
+            }
+          }
+        
+        //Option 2: Right child which doesnt have a left child
+        } else if (currentNode.right.left === null) {
+          currentNode.right.left = currentNode.left;
+          if(parentNode === null) {
+            this.root = currentNode.right;
+          } else {
+            
+            //if parent > current, make right child of the left the parent
+            if(currentNode.value < parentNode.value) {
+              parentNode.left = currentNode.right;
+            
+            //if parent < current, make right child a right child of the parent
+            } else if (currentNode.value > parentNode.value) {
+              parentNode.right = currentNode.right;
+            }
+          }
+        
+        //Option 3: Right child that has a left child
+        } else {
+
+          //find the Right child's left most child
+          let leftmost = currentNode.right.left;
+          let leftmostParent = currentNode.right;
+          while(leftmost.left !== null) {
+            leftmostParent = leftmost;
+            leftmost = leftmost.left;
+          }
+          
+          //Parent's left subtree is now leftmost's right subtree
+          leftmostParent.left = leftmost.right;
+          leftmost.left = currentNode.left;
+          leftmost.right = currentNode.right;
+
+          if(parentNode === null) {
+            this.root = leftmost;
+          } else {
+            if(currentNode.value < parentNode.value) {
+              parentNode.left = leftmost;
+            } else if(currentNode.value > parentNode.value) {
+              parentNode.right = leftmost;
+            }
+          }
+        }
+      return true;
+      }
+    }
+  }
+}
+
+const tree = new BinarySearchTree();
+tree.insert(9)
+tree.insert(4)
+tree.insert(6)
+tree.insert(20)
+tree.insert(170)
+tree.insert(15)
+tree.insert(1)
+tree.remove(170)
+JSON.stringify(traverse(tree.root))
+
+//     9
+//  4     20
+//1  6  15  170
+
+function traverse(node) {
+  const tree = { value: node.value };
+  tree.left = node.left === null ? null : traverse(node.left);
+  tree.right = node.right === null ? null : traverse(node.right);
+  return tree;
+}
+
+```
+To balance the tree (To make sure that the levels of the tree are always balanced):
+- AVL Tree
+- Red Black Tree
+
+Binary Heap (Priority Queue):
+- Min Binary Heap
+- Max Binary Heap
+  
+Time complexity of **Binary Heap**
+-   lookup O(n)
+-   insert O(log N)
+-   delete O(log N)
+
+Binary Heap is really great at doing comparative operations
+
+## Trie
+---
+Also known as (Prefix Tree)
+- Tree liked data structure which proves to be efficient in solving problems specific to strings, ex: auto completion, search word in dictionary, providing suggestions on search engines, IP routing..
+- Benefit of this is speed and space
+- O(length of the word)
+
+
+## Graph
+---
+- Graph: A set of values that are related in a pariwise fashion
+- In a graph, each item is called a node/vertex, nodes are connected with edges
+- Great data structures to model real world relationships
+
+Types of **graphs**
+- Directed Graph
+- Undirected Graph
+- Weighted Graph
+- Unweighted Graph
+- Cyclic Graph
+- Acyclic Graph
+
+
+Pros:
+- Time complexity can be complicated because there are so many type of graph
+- Graphs are useful when it comes to relationship
+- Algorithm around graphs that allow us to perform operations such as finding the shortest path or traversing a graph
+  
+Cons:
+- Because graphs can get complicated, scaling is hard
+  
+*Note: Most of the time, developer use tools/software like Neo4j which is a graph database management system to build complex structures to contain data.
+
+
+```
+Three ways graph holds data
+// Edge List
+const graph = [[0,2], [2,3], [2,1], [1,3]];
+
+// Adjacent List 
+const graph = [[2], [2,3], [0,1,3], [1,2]]
+
+// Adjacent Matrix
+const graph = [
+    [0,0,1,0],
+    [0,0,1,1],
+    [1,1,0,1],
+    [0,1,1,0]
+]
+```
+
+**Graph Implementation**
+```
+class Graph {
+    constructor() {
+        this.numberOfNodes = 0;
+        this.adjacentList = {};
+    }
+    addVertex(node)
+    {
+        this.adjacentList[node] = [];
+        this.numberOfNodes++;
+    }
+    addEdge(node1, node2) {
+        //undirected Graph
+        this.adjacentList[node1].push(node2);
+        this.adjacentList[node2].push(node1);
+    }
+    showConnections() {
+        const allNodes = Object.keys(this.adjacentList);
+        for (let node of allNodes) {
+            let nodeConnections = this.adjacentList[node];
+            let connections = "";
+            let vertex;
+            for (vertex of nodeConnections) {
+                connections += vertex + " ";
+            }
+            console.log(node + "-->" + connections);
+        }
+    }
+}
+
+const myGraph = new Graph();
+myGraph.addVertex("0");
+myGraph.addVertex("1");
+myGraph.addVertex("2");
+myGraph.addVertex("3");
+myGraph.addVertex("4");
+myGraph.addVertex("5");
+myGraph.addVertex("6");
+myGraph.addEdge("3", "1");
+myGraph.addEdge("3", "4");
+myGraph.addEdge("4", "2");
+myGraph.addEdge("4", "5");
+myGraph.addEdge("1", "2");
+myGraph.addEdge("1", "0");
+myGraph.addEdge("0", "2");
+myGraph.addEdge("6", "5");
+
+myGraph.showConnections();
+//Answer:
+// 0-->1 2
+// 1-->3 2 0
+// 2-->4 1 0
+// 3-->1 4
+// 4-->3 2 5
+// 5-->4 6
+// 6-->5
+```
 
