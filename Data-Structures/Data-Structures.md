@@ -19,6 +19,7 @@ Data structures has their own trade-offs at **Operations**:
     -   [Binary Tree](#binary-tree)
     -   [Trie](#trie)
 -   [Graph](#graph)
+  
 ## Array
 
 ---
